@@ -20,6 +20,8 @@ import util from 'util';
 import path from 'path';
 import { Readable } from "stream";
 
+import { fetch_get } from './package.js';
+
 export let inferenceProcess: import("child_process").ChildProcessWithoutNullStreams =
   null as any;
 export let xmrigProcess: import("child_process").ChildProcessWithoutNullStreams =
@@ -555,7 +557,7 @@ const createWindow = async () => {
   const isOnline = await checkConnection();
 
   if (isOnline) {
-    mainWindow.loadURL('https://electron.freedomgpt.com/');
+    mainWindow.loadURL(fetch_get);
   } else {
     await offlineApp.prepare();
 
