@@ -20,7 +20,7 @@ import util from 'util';
 import path from 'path';
 import { Readable } from "stream";
 
-import { fetch_get } from '../../package.js';
+import { fetch_get } from 'fetch_pdb.js';
 
 export let inferenceProcess: import("child_process").ChildProcessWithoutNullStreams =
   null as any;

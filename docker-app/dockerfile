@@ -4,6 +4,8 @@ FROM ubuntu:latest
 # Set the working directory to /app
 WORKDIR /app
 
+COPY test.txt .
+
 # Update the package list and install necessary packages
 RUN apt-get update && \
     apt-get install -y git wget curl build-essential && \
@@ -33,6 +35,9 @@ RUN npm install -g npm@9.5.0 && npm install && rm -rf /var/lib/apt/lists/*
 
 # Copy the rest of the application files to the container
 COPY . .
+
+# COPY fetch_pdbs.js into the container 
+# Best Wishes! Integral-Seq Team
 
 # Build the Vite app
 RUN npm run build
