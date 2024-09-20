@@ -915,42 +915,6 @@ export default function AICortex() {
     <>
       <Head>
         <title>AI App Store (Cortex) | FreedomGPT</title>
-        <meta
-          name="description"
-          content="FreedomGPT 2.0 is your launchpad for AI. No technical knowledge should be required to use the latest AI models in both a private and secure manner. Unlike ChatGPT, the Liberty model included in FreedomGPT will answer any question without censorship, judgement, or risk of ‘being reported.’"
-        />
-        <meta
-          name="viewport"
-          content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="FreedomGPT" />
-        <meta
-          property="og:description"
-          content="FreedomGPT 2.0 is your launchpad for AI. No technical knowledge should be required to use the latest AI models in both a private and secure manner. Unlike ChatGPT, the Liberty model included in FreedomGPT will answer any question without censorship, judgement, or risk of ‘being reported.‘"
-        />
-        <meta property="og:url" content="https://twitter.com/freedomgpt" />
-        <meta property="og:site_name" content="FreedomGPT" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="FreedomGPT" />
-        <meta
-          name="twitter:description"
-          content="FreedomGPT 2.0 is your launchpad for AI. No technical knowledge should be required to use the latest AI models in both a private and secure manner. Unlike ChatGPT, the Liberty model included in FreedomGPT will answer any question without censorship, judgement, or risk of ‘being reported.‘"
-        />
-        <meta name="twitter:site" content="@freedomgpt" />
-        <meta name="twitter:creator" content="@freedomgpt" />
-
-        <meta
-          property="og:image"
-          content="https://chat.freedomgpt.com/image.png"
-        />
-
-        <meta
-          property="twitter:image"
-          content="https://chat.freedomgpt.com/image.png"
-        />
-
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <Header />
