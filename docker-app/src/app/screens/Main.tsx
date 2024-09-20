@@ -141,20 +141,9 @@ export default function Main() {
           </div>
         ) : (
           <div
-            style={{
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              display: "flex",
-            }}
           >
             <div
-              style={{
-                width: "100%",
-              }}
-              className="initial_loader_wrapper"
             >
-              <InitialLoader setInput={setInput} inputRef={inputRef} />
             </div>
           </div>
         )}
