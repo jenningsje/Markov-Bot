@@ -14,8 +14,6 @@ export default function Document(props: Props) {
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="FreedomGPT"></meta>
-        <link rel="apple-touch-icon" href="/icon.png" type="image/png" />
-        <link rel="icon" href="/icon.png" type="image/png" />
       </Head>
       <body>
         <Main />
