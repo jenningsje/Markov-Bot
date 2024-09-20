@@ -99,7 +99,7 @@ const Sidebar = <T,>({
               window.location.href = '/';
             }}
           >
-            FreedomGPT
+            MarkovEklypse
           </h2>
         </div>
         <div className="flex items-center align-center px-3">
