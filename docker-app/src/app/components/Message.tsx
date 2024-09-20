@@ -74,25 +74,6 @@ export default function Message({ user, message, id }: MessageType) {
             alignItems: "flex-start",
           }}
         >
-          {user ? (
-            <p
-              style={{
-                fontSize: "40px",
-                marginTop: "-15px",
-              }}
-            >
-              🗣️
-            </p>
-          ) : (
-            <p
-              style={{
-                fontSize: "45px",
-                marginTop: "-15px",
-              }}
-            >
-              🗽
-            </p>
-          )}
         </div>
         <div
           style={{
