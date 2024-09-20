@@ -1,3 +1,3 @@
-export const APPNAME = "FreedomGPT";
+export const APPNAME = "Markov-Eklypse";
 export const BOTTOMTEXT =
-  "FreedomGPT Mar 22 Version: Free Research Preview. Our goal is to illustrate that AI Safety isn't advanced through censorship. Additionally, we believe every company and individual should have access to their own 100% private LLM. For more information reach out at contact@ageofai.capital";
+  "The Markov-Eklpyse is trained on the all the research papers on the nih database. Its purpose is to tell the user about how protein protein interactions affect a given organism. Afterwards the user may simulate the protein protein interaction in the simulator tool. Directions will be provided there as well. Best! Integral Sequencing Team.";
