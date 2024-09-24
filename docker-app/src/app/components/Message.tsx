@@ -1,5 +1,6 @@
 import { useMessageFetching } from "../context/MessageFetch";
 import { MessageType } from "../types/types";
+import logo from './logo.png';
 
 const Reply = ({ message, id }: { message: string; id: string }) => {
   const { messageFetching, messages } = useMessageFetching();
@@ -84,7 +85,7 @@ export default function Message({ user, message, id }: MessageType) {
               🗣️
             </p>
           ) : (
-            <img src="logo.png" alt="Example Image" width="128" height="128"></img>
+            <img src={logo} alt="Markov Eklypse" width="128" height="128"></img>
           )}
         </div>
         <div
