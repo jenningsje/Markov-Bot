@@ -1,4 +1,4 @@
-cp ../../fetch-pdbs/fetch_pdbs.js ../src/fetch_pdbs.js
+cp ../../fetch-get/fetch_get.js ../src/fetch_get.js
 cp ../../logo.png logo.png
 cp ../../logo.png ./src/app/components/logo.png
 docker build -t freedomgpt/freedomgpt .
