@@ -82,7 +82,6 @@ export default function Message({ user, message, id }: MessageType) {
                 marginTop: "-15px",
               }}
             >
-              🗣️
             </p>
           ) : (
             <p
