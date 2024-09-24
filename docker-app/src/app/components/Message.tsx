@@ -85,7 +85,14 @@ export default function Message({ user, message, id }: MessageType) {
               🗣️
             </p>
           ) : (
-            <img src={logo} alt="Markov Eklypse" width="128" height="128"></img>
+            <p
+              style={{
+                fontSize: "40px",
+                marginTop: "-15px",
+              }}
+            >
+            <img src={logo} alt="Markov Eklypse" width="25" height="25"></img>
+            </p>
           )}
         </div>
         <div
