@@ -29,7 +29,9 @@ COPY package*.json ./
 # Install the dependencies and Node.js
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs
-RUN npm install -g npm@9.5.0 && npm install && rm -rf /var/lib/apt/lists/*
+RUN npm install -g npm@9.5.0 && npm install && rm -rf /var/lib/apt/lists/* && \
+    npm install xmlhttprequest \
+    npm audit fix --force
 
 # Copy the rest of the application files to the container
 COPY . .
