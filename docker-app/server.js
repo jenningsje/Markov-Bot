@@ -61,23 +61,28 @@ io.on("connection", (socket) => {
       program = spawn(CHAT_APP_LOCATION, ["-m", FILEPATH]);
     }
 
-    program.stdin.write(message + "\n");
+    // Fetch all APIs and combine their data into a single string
+    const apiResults = await fetchAllAPIs();
+    let combinedAPIData = '';
+    for (const r of apiResults) {
+      if (r.success && typeof r.data === 'string') {
+        combinedAPIData += r.data + '\n';
+      }
+    }
 
-    // Listen to chat program output
+    // Feed API data into the chat program for training
+    if (combinedAPIData) {
+      program.stdin.write(combinedAPIData + '\n');
+    }
+
+    // Feed the user's message
+    program.stdin.write(message + '\n');
+
+    // Listen to chat program output safely
     program.stdout.on("data", (data) => {
-      let output = data.toString("utf8");
-      output = output.replace(">", "");
+      const output = String(data).replace(/>/g, "");
       socket.emit("response", { result: "chat_output", output });
     });
-
-    // Fetch all APIs and emit the data
-    const apiResults = await fetchAllAPIs();
-    socket.emit("response", { result: "api_data", output: apiResults });
-
-    // Optionally stop the program if needed
-    // program.kill();
-    // program = null;
-    // socket.emit("chatend");
   });
 
   socket.on("disconnect", () => {
