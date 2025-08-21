@@ -3,6 +3,8 @@ import express from "express";
 import http from "http";
 import path from "path";
 import { Server } from "socket.io";
+import { fetchAllAPIs } from "./fetch_get.js";
+import fetch from "node-fetch"; // Using fetch in Node
 
 const expressapp = express();
 const server = http.createServer(expressapp);
@@ -14,7 +16,6 @@ const io = new Server(server, {
 });
 
 const EXPRESSPORT = 8889;
-
 let numClients = 0;
 
 expressapp.use(
@@ -34,8 +35,8 @@ io.on("connection", (socket) => {
   }
 
   numClients++;
-
   console.log("Client Connected");
+
   const CHAT_APP_LOCATION = path.join(process.cwd(), "/chat");
   const FILEPATH = path.join(process.cwd(), "/ggml-alpaca-7b-q4.bin");
 
@@ -50,38 +51,38 @@ io.on("connection", (socket) => {
   });
 
   socket.on("stopResponding", () => {
-    program.kill();
+    if (program) program.kill();
     program = null;
     socket.emit("chatend");
   });
 
-  socket.on("message", (message) => {
+  socket.on("message", async (message) => {
+    if (!program) {
+      program = spawn(CHAT_APP_LOCATION, ["-m", FILEPATH]);
+    }
+
     program.stdin.write(message + "\n");
 
-    let closing = "";
+    // Listen to chat program output
     program.stdout.on("data", (data) => {
       let output = data.toString("utf8");
-
-      if (output.includes(">")) {
-        closing = closing.concat(">");
-      }
-
       output = output.replace(">", "");
-
-      const response = { result: "success", output: output };
-      socket.emit("response", response);
-
-      if (closing.includes(">>")) {
-        program.kill();
-        program = null;
-        socket.emit("chatend");
-      }
+      socket.emit("response", { result: "chat_output", output });
     });
+
+    // Fetch all APIs and emit the data
+    const apiResults = await fetchAllAPIs();
+    socket.emit("response", { result: "api_data", output: apiResults });
+
+    // Optionally stop the program if needed
+    // program.kill();
+    // program = null;
+    // socket.emit("chatend");
   });
 
   socket.on("disconnect", () => {
     numClients--;
-    program.kill();
+    if (program) program.kill();
     program = null;
   });
 });
