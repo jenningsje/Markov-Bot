@@ -4,10 +4,15 @@ import http from "http";
 import path from "path";
 import { Server } from "socket.io";
 import { fetchAllAPIs } from "./fetch_get.js";
-import fetch from "node-fetch"; // Using fetch in Node
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const EXPRESSPORT = 8889;
 const expressapp = express();
 const server = http.createServer(expressapp);
+
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -15,80 +20,100 @@ const io = new Server(server, {
   },
 });
 
-const EXPRESSPORT = 8889;
-let numClients = 0;
-
+// ----- Serve static frontend correctly -----
 expressapp.use(
   "/assets",
-  express.static(path.join(process.cwd(), "dist/assets"))
+  express.static(path.join(__dirname, "dist/assets"))
 );
 
 expressapp.get("*", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "dist/index.html"));
+  res.sendFile(path.join(__dirname, "dist/index.html"));
 });
 
-io.on("connection", (socket) => {
-  if (numClients === 1) {
-    console.log("Only one client allowed");
-    socket.disconnect();
-    return;
+// ----- API caching -----
+let combinedAPIData = '';
+
+async function refreshAPIs() {
+  try {
+    console.log("Fetching API data...");
+    const apiResults = await fetchAllAPIs();
+    combinedAPIData = apiResults
+      .filter(r => r.success && r.data)
+      .map(r => typeof r.data === 'object' ? JSON.stringify(r.data) : String(r.data))
+      .join('\n');
+    console.log("API data cached successfully.");
+  } catch (err) {
+    console.error("Error refreshing APIs:", err);
   }
+}
 
-  numClients++;
-  console.log("Client Connected");
+// Initial fetch
+await refreshAPIs();
 
-  const CHAT_APP_LOCATION = path.join(process.cwd(), "/chat");
-  const FILEPATH = path.join(process.cwd(), "/ggml-alpaca-7b-q4.bin");
+// Refresh every hour
+setInterval(refreshAPIs, 60 * 60 * 1000);
 
+// ----- Socket.IO handling -----
+io.on("connection", (socket) => {
+  console.log("Client connected");
+
+  const CHAT_APP_LOCATION = path.join(__dirname, "/chat");
+  const FILEPATH = path.join(__dirname, "/ggml-alpaca-7b-q4.bin");
+
+  // Spawn chat program for this client
   let program = spawn(CHAT_APP_LOCATION, ["-m", FILEPATH]);
 
-  socket.on("chatstart", () => {
-    program = spawn(CHAT_APP_LOCATION, ["-m", FILEPATH]);
+  // Single stdout listener
+  program.stdout.on("data", (data) => {
+    const output = String(data).replace(/>/g, "");
+    socket.emit("response", { result: "chat_output", output });
   });
 
   program.on("error", (err) => {
-    console.error(err);
+    console.error("Chat program error:", err);
+  });
+
+  socket.on("chatstart", () => {
+    if (!program || program.killed) {
+      program = spawn(CHAT_APP_LOCATION, ["-m", FILEPATH]);
+      program.stdout.on("data", (data) => {
+        const output = String(data).replace(/>/g, "");
+        socket.emit("response", { result: "chat_output", output });
+      });
+    }
   });
 
   socket.on("stopResponding", () => {
-    if (program) program.kill();
+    if (program && !program.killed) {
+      program.kill();
+    }
     program = null;
     socket.emit("chatend");
   });
 
   socket.on("message", async (message) => {
-    if (!program) {
+    if (!program || program.killed) {
       program = spawn(CHAT_APP_LOCATION, ["-m", FILEPATH]);
+      program.stdout.on("data", (data) => {
+        const output = String(data).replace(/>/g, "");
+        socket.emit("response", { result: "chat_output", output });
+      });
     }
 
-    // Fetch all APIs and combine their data into a single string
-    const apiResults = await fetchAllAPIs();
-    let combinedAPIData = '';
-    for (const r of apiResults) {
-      if (r.success && typeof r.data === 'string') {
-        combinedAPIData += r.data + '\n';
+    if (program.stdin.writable) {
+      if (combinedAPIData) {
+        program.stdin.write(combinedAPIData + "\n");
       }
+      program.stdin.write(message + "\n");
+    } else {
+      console.warn("Chat program stdin not writable, skipping message.");
     }
-
-    // Feed API data into the chat program for training
-    if (combinedAPIData) {
-      program.stdin.write(combinedAPIData + '\n');
-    }
-
-    // Feed the user's message
-    program.stdin.write(message + '\n');
-
-    // Listen to chat program output safely
-    program.stdout.on("data", (data) => {
-      const output = String(data).replace(/>/g, "");
-      socket.emit("response", { result: "chat_output", output });
-    });
   });
 
   socket.on("disconnect", () => {
-    numClients--;
-    if (program) program.kill();
+    if (program && !program.killed) program.kill();
     program = null;
+    console.log("Client disconnected");
   });
 });
 
